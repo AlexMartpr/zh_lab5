@@ -7,6 +7,8 @@ public class ActorCache extends AbstractActor {
     private Map<String, Long> store = new HashMap<>();
     @Override
     public Receive createReceive() {
-        return null;
+        return receiveBuilder().match(
+                ActorApp.Message.class
+        )
     }
 }

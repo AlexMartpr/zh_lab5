@@ -10,30 +10,33 @@ import akka.http.javadsl.model.HttpResponse;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 
-import java.io.IOException;
 import java.util.concurrent.CompletionStage;
 
 public class ActorApp {
     private static final String HOST = "localhost";
     private static final int PORT = 8080;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         System.out.println("start!");
         ActorSystem system = ActorSystem.create("Akka_Lab_5");
         ActorRef cache = system.actorOf(Props.create(ActorCache.class));
 
         final Http http = Http.get(system);
         final ActorMaterializer materializer = ActorMaterializer.create(system);
-        final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = FlowCreator.createFlow(materializer, cache);
-        final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow, ConnectHttp.toHost(HOST, PORT), materializer);
-        System.out.println("Serer online at http://localhost:8080/\nPress RETURN to stop...");
-        System.in.read();
-        binding.thenCompose(
-                ServerBinding::unbind
-        ).thenAccept(
-                
-        )
-
+        final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow;
+        try {
+            routeFlow = FlowCreator.createFlow(materializer, cache);
+            final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow, ConnectHttp.toHost(HOST, PORT), materializer);
+            System.out.println("Serer online at http://localhost:8080/\nPress RETURN to stop...");
+            System.in.read();
+            binding.thenCompose(
+                    ServerBinding::unbind
+            ).thenAccept(
+                    unbound -> system.terminate()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
     }
-
 }

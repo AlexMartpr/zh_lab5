@@ -31,7 +31,7 @@ public class FlowCreator {
 
     public FlowCreator() {}
 
-    public static Flow<HttpRequest, HttpResponse, NotUsed> createFlow(ActorMaterializer materializer, ActorRef cache) {
+    public static Flow<HttpRequest, HttpResponse, NotUsed> createFlow(ActorMaterializer materializer, ActorRef cache) throws Exception {
         return Flow.of(HttpRequest.class).map(
                 req -> {
                     Query query = req.getUri().query();

@@ -9,7 +9,9 @@ public class ActorCache extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder().match(
                 Message.class,
-                message -> sender().tell()
+                message -> sender().tell(
+                        store.getOrDefault()
+                )
         )
     }
 }

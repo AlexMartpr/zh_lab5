@@ -30,7 +30,7 @@ public class FlowCreator {
     private static final int NUMBER = 10;
 
     public FlowCreator() {};
-    public Flow<HttpRequest, HttpResponse, NotUsed> createFlow(ActorMaterializer materializer, ActorRef cache) {
+    public static Flow<HttpRequest, HttpResponse, NotUsed> createFlow(ActorMaterializer materializer, ActorRef cache) {
         return Flow.of(HttpRequest.class).map(
           req -> {
                 Query query = req.getUri().query();

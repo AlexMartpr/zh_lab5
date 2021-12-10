@@ -59,7 +59,7 @@ public class FlowCreator {
                             if ((int) res >= 0) {
                                 return CompletableFuture.completedFuture(new Pair<>(req.first(), (int)res));
                             } else {
-                                
+                                Sink
                                 Sink<Pair<String, Integer>, CompletionStage<Long>> sink = Flow.<Pair<String, Integer>>create()
                                         .mapConcat(pair ->
                                                 new ArrayList<>(Collections.nCopies(pair.second(), pair.first())))

@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ActorCache extends AbstractActor {
-    private final Map<String, Integer> store = new HashMap<>();
+    private final Map<String, Long> store = new HashMap<>();
     @Override
     public Receive createReceive() {
         return receiveBuilder().match(
                 Message.class,
                 message -> sender().tell(
-                        store.getOrDefault(message.getUrl(), -1),
+                        store.getOrDefault(message.getUrl(), (long) -1.0),
                         ActorRef.noSender()
                 )
         ).match(

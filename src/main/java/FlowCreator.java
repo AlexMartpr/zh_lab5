@@ -3,6 +3,7 @@ import akka.actor.ActorRef;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
 import akka.http.javadsl.model.Query;
+import akka.pattern.Patterns;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import javafx.util.Pair;
@@ -11,7 +12,7 @@ import javafx.util.Pair;
 public class FlowCreator {
     private static final String URL = "testUrl";
     private static final String COUNT = "count";
-    private static final String 
+    private static final int NUMBER = 10;
 
     public FlowCreator() {};
     public Flow<HttpRequest, HttpResponse, NotUsed> createFlow(ActorMaterializer materializer, ActorRef cache) {
@@ -36,6 +37,11 @@ public class FlowCreator {
                     throw new Exception("Can not parse value of count");
                 }
           }
-        ).mapAsync()
+        ).mapAsync(NUMBER, req -> {
+            Patterns.ask(
+                    cache,
+
+            )
+        })
     }
 }

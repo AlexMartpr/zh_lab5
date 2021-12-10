@@ -8,7 +8,7 @@ import akka.stream.javadsl.Flow;
 public class FlowCreator {
     public FlowCreator() {};
     public Flow<HttpRequest, HttpResponse, NotUsed> createFlow(ActorMaterializer materializer, ActorRef cache) {
-        
+
         return null;
     };
 }

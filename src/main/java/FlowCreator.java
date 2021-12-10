@@ -7,6 +7,8 @@ import akka.pattern.Patterns;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+
 import akka.japi.Pair;
 
 
@@ -42,7 +44,11 @@ public class FlowCreator {
         ).mapAsync(NUMBER, req -> {
             Patterns.ask(cache, new Message(req.first()), Duration.ofSeconds(DURATION)).thenCompose(
                     res -> {
-                        
+                        if ((int)res >= 0) {
+                            return CompletableFuture.completedFuture(new Pair<>(req.first(), (int)res));
+                        } else {
+                            
+                        }
                     }
             ) {
 

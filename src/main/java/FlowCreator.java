@@ -47,7 +47,7 @@ public class FlowCreator {
                         if ((int)res >= 0) {
                             return CompletableFuture.completedFuture(new Pair<>(req.first(), (int)res));
                         } else {
-                            
+
                         }
                     }
             ) {

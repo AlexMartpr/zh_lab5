@@ -52,7 +52,7 @@ public class FlowCreator {
                     throw new Exception("Can not parse value of count");
                 }
           }
-        ).mapAsync(NUMBER, req -> {
+        ).mapAsync(NUMBER, req ->
             Patterns.ask(cache, new Message(req.first()), Duration.ofSeconds(DURATION)).thenCompose(
                     res -> {
                         if ((int) res >= 0) {
@@ -76,7 +76,6 @@ public class FlowCreator {
                                     .thenApply(s ->
                                             new Pair<>(req.first(), s / req.second()));
                         }
-                    })).map(res -> {
                     }
-        })
-}
+            )).map()
+    }

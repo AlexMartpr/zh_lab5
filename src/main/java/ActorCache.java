@@ -1,7 +1,10 @@
 import akka.actor.AbstractActor;
 
-public class ActorCache extends AbstractActor {
+import java.util.HashMap;
+import java.util.Map;
 
+public class ActorCache extends AbstractActor {
+    private Map<String, Long> store = new HashMap<>();
     @Override
     public Receive createReceive() {
         return null;

@@ -54,7 +54,8 @@ public class FlowCreator {
                                         new ArrayList<>(Collections.nCopies(pair.second(), pair.first()))
                                     )
                             ).mapAsync(req.second(), url -> {
-                                long initTime = 
+                                long initTime = System.currentTimeMillis();
+                                asyncHttpClient().
                             })
                         }
                     }

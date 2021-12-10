@@ -1,2 +1,2 @@
-public class Cache {
+public class ActorCache {
 }

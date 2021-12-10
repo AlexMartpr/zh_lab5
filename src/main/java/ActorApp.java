@@ -13,7 +13,7 @@ public class ActorApp {
     public static void main(String[] args) {
         System.out.println("start!");
         ActorSystem system = ActorSystem.create("Akka_Lab_5");
-        ActorRef cache = system.actorOf(Props.create(Cache.class));
+        ActorRef cache = system.actorOf(Props.create(ActorCache.class));
 
         final Http http = Http.get(system);
         final ActorMaterializer materializer = ActorMaterializer.create(system);

@@ -59,6 +59,7 @@ public class FlowCreator {
                             if ((int) res >= 0) {
                                 return CompletableFuture.completedFuture(new Pair<>(req.first(), (int)res));
                             } else {
+                                
                                 Sink<Pair<String, Integer>, CompletionStage<Long>> sink = Flow.<Pair<String, Integer>>create()
                                         .mapConcat(pair ->
                                                 new ArrayList<>(Collections.nCopies(pair.second(), pair.first())))
@@ -77,7 +78,7 @@ public class FlowCreator {
                         }
                 )).map(resultPair -> {
                     cache.tell(new MessageCache(resultPair.first(), (Long) resultPair.second()), ActorRef.noSender());
-                    return HttpResponse.create().withEntity(resultPair.first() + " " + resultPair.second());
+                    return HttpResponse.create().withEntity(resultPair.first() + " " + ((Long) resultPair.second()).toString());
                 }
         );
     }

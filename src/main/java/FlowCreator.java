@@ -20,7 +20,7 @@ public class FlowCreator {
                 if (query.get(URL).isPresent()) {
                     url = query.get(URL).get();
                 } else {
-                    throw new Error();
+                    throw new Exception("No URL parameter");
                 }
               return null;
           }

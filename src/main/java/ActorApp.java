@@ -9,6 +9,8 @@ import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 
 public class ActorApp {
+    private static final String HOST = "localhost";
+    private static final int PORT = 
 
     public static void main(String[] args) {
         System.out.println("start!");

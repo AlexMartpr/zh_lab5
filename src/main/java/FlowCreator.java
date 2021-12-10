@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 
 import akka.japi.Pair;
 
+import static org.asynchttpclient.Dsl.asyncHttpClient;
 
 public class FlowCreator {
     private static final String URL = "testUrl";

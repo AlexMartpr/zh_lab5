@@ -35,7 +35,7 @@ public class ActorApp {
                     unbound -> system.terminate()
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             System.exit(-1);
         }
     }

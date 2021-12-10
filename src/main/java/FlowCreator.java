@@ -10,10 +10,14 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import akka.japi.Pair;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
+import org.asynchttpclient.Dsl;
+import org.asynchttpclient.Request;
+import org.asynchttpclient.Response;
 
 import static org.asynchttpclient.Dsl.asyncHttpClient;
 
@@ -52,7 +56,14 @@ public class FlowCreator {
                         if ((int)res>=0) {
                             return CompletableFuture.completedFuture(new Pair<>(req.first(), res));
                         } else {
-                            
+                            Sink<Pair<String, Integer>, CompletionStage<Long>> sink = Flow.<Pair<String, Integer>>create()
+                                    .mapConcat(pair ->
+                                            new ArrayList<>(Collections.nCopies(pair.second(), pair.first())))
+                                    .mapAsync(req.second(), url -> {
+                                        long initTime = System.currentTimeMillis();
+                                        Request request = Dsl.get(url).build();
+                                        CompletableFuture<Response> resp = Dsl.asyncHttpClient().executeRequest(request).toCompletableFuture()
+                                    })
                         }
                     }
             ) {

@@ -59,14 +59,13 @@ public class FlowCreator {
                             if ((int) res >= 0) {
                                 return CompletableFuture.completedFuture(new Pair<>(req.first(), (int)res));
                             } else {
-
                                 Sink<Pair<String, Integer>, CompletionStage<Long>> sink = Flow.<Pair<String, Integer>>create()
                                         .mapConcat(pair ->
                                                 new ArrayList<>(Collections.nCopies(pair.second(), pair.first())))
                                         .mapAsync(req.second(), url -> {
                                             long initTime = System.currentTimeMillis();
                                             Request request = Dsl.get(url).build();
-                                            CompletableFuture<Response> resp = asyncHttpClient().executeRequest(request).toCompletableFuture();
+                                            CompletableFuture<Response> resp = Dsl.asyncHttpClient().executeRequest(request).toCompletableFuture();
                                             return resp.thenCompose(response -> CompletableFuture.completedFuture((int) (System.currentTimeMillis() - initTime)));
                                         }).toMat(Sink.fold(0L, (Function2<Long, Integer, Long>) Long::sum), Keep.right());
                                 return Source.from(Collections.singletonList(req))

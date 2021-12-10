@@ -49,20 +49,7 @@ public class FlowCreator {
         ).mapAsync(NUMBER, req -> {
             Patterns.ask(cache, new Message(req.first()), Duration.ofSeconds(DURATION)).thenCompose(
                     res -> {
-                        if ((int)res >= 0) {
-                            return CompletableFuture.completedFuture(new Pair<>(req.first(), (int)res));
-                        } else {
-                            Flow<Pair<String, Integer>, Integer, NotUsed> flow = Flow.<Pair<String, Integer>>create().mapConcat(
-                                    pair -> (
-                                        new ArrayList<>(Collections.nCopies(pair.second(), pair.first()))
-                                    )
-                            ).mapAsync(req.second(), url -> {
-                                long initTime = System.currentTimeMillis();
-                                asyncHttpClient().prepareGet(url).execute();
-                                return CompletableFuture.completedFuture((int)(System.currentTimeMillis() - initTime));
-                            });
-                            return Source.from(Collections.singletonList(req)).via(flow).toMat(Sink.fold())
-                        }
+                        
                     }
             ) {
 

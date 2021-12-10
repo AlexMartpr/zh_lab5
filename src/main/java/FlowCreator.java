@@ -29,53 +29,57 @@ public class FlowCreator {
     private static final int DURATION = 5;
     private static final int NUMBER = 10;
 
-    public FlowCreator() {};
+    public FlowCreator() {}
+
     public static Flow<HttpRequest, HttpResponse, NotUsed> createFlow(ActorMaterializer materializer, ActorRef cache) {
         return Flow.of(HttpRequest.class).map(
-          req -> {
-                Query query = req.getUri().query();
-                String url;
-                if (query.get(URL).isPresent()) {
-                    url = query.get(URL).get();
-                } else {
-                    throw new Exception("No URL parameter");
-                }
-                int count;
-                try {
-                    if (query.get(COUNT).isPresent()) {
-                        count = Integer.parseInt(query.get(COUNT).get());
-                        return new Pair<>(url, count);
+                req -> {
+                    Query query = req.getUri().query();
+                    String url;
+                    if (query.get(URL).isPresent()) {
+                        url = query.get(URL).get();
                     } else {
-                        throw new Exception("No count parameter");
+                        throw new Exception("No URL parameter");
                     }
-                } catch (NumberFormatException e) {
-                    throw new Exception("Can not parse value of count");
-                }
-          }
-        ).mapAsync(NUMBER, req ->
-            Patterns.ask(cache, new Message(req.first()), Duration.ofSeconds(DURATION)).thenCompose(
-                    res -> {
-                        if ((int) res >= 0) {
-                            return CompletableFuture.completedFuture(new Pair<>(req.first(), res));
+                    int count;
+                    try {
+                        if (query.get(COUNT).isPresent()) {
+                            count = Integer.parseInt(query.get(COUNT).get());
+                            return new Pair<>(url, count);
                         } else {
-
-                            Sink<Pair<String, Integer>, CompletionStage<Long>> sink = Flow.<Pair<String, Integer>>create()
-                                    .mapConcat(pair ->
-                                            new ArrayList<>(Collections.nCopies(pair.second(), pair.first())))
-                                    .mapAsync(req.second(), url -> {
-                                        long initTime = System.currentTimeMillis();
-                                        Request request = Dsl.get(url).build();
-                                        CompletableFuture<Response> resp = asyncHttpClient().executeRequest(request).toCompletableFuture();
-                                        return resp.thenCompose(response -> {
-                                            return CompletableFuture.completedFuture((int) (System.currentTimeMillis() - initTime));
-                                        });
-                                    }).toMat(Sink.fold(0L, (Function2<Long, Integer, Long>) Long::sum), Keep.right());
-                            return Source.from(Collections.singletonList(req))
-                                    .toMat(sink, Keep.right())
-                                    .run(materializer)
-                                    .thenApply(s ->
-                                            new Pair<>(req.first(), s / req.second()));
+                            throw new Exception("No count parameter");
                         }
+                    } catch (NumberFormatException e) {
+                        throw new Exception("Can not parse value of count");
                     }
-            )).map()
+                }
+        ).mapAsync(NUMBER, req ->
+                Patterns.ask(cache, new Message(req.first()), Duration.ofSeconds(DURATION)).thenCompose(
+                        res -> {
+                            if ((int) res >= 0) {
+                                return CompletableFuture.completedFuture(new Pair<>(req.first(), res));
+                            } else {
+
+                                Sink<Pair<String, Integer>, CompletionStage<Long>> sink = Flow.<Pair<String, Integer>>create()
+                                        .mapConcat(pair ->
+                                                new ArrayList<>(Collections.nCopies(pair.second(), pair.first())))
+                                        .mapAsync(req.second(), url -> {
+                                            long initTime = System.currentTimeMillis();
+                                            Request request = Dsl.get(url).build();
+                                            CompletableFuture<Response> resp = asyncHttpClient().executeRequest(request).toCompletableFuture();
+                                            return resp.thenCompose(response -> CompletableFuture.completedFuture((int) (System.currentTimeMillis() - initTime)));
+                                        }).toMat(Sink.fold(0L, (Function2<Long, Integer, Long>) Long::sum), Keep.right());
+                                return Source.from(Collections.singletonList(req))
+                                        .toMat(sink, Keep.right())
+                                        .run(materializer)
+                                        .thenApply(s ->
+                                                new Pair<>(req.first(), s / req.second()));
+                            }
+                        }
+                )).map(resultPair -> {
+                    cache.tell(new MessageCache(resultPair.first(), (long) resultPair.second()), ActorRef.noSender());
+                    return HttpResponse.create().withEntity(resultPair.first() + " " + resultPair.second());
+                }
+        );
     }
+}

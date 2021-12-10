@@ -8,7 +8,8 @@ public class ActorCache extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder().match(
-                ActorApp.Message.class
+                Message.class,
+                
         )
     }
 }

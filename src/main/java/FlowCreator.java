@@ -7,7 +7,7 @@ import akka.pattern.Patterns;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import java.time.Duration;
-import javafx.util.Pair;
+import akka.japi.Pair;
 
 
 public class FlowCreator {
@@ -40,7 +40,7 @@ public class FlowCreator {
                 }
           }
         ).mapAsync(NUMBER, req -> {
-            Patterns.ask(cache, new Message(req.getKey()), Duration.ofSeconds(DURATION)).thenCompose(
+            Patterns.ask(cache, new Message(req.first()), Duration.ofSeconds(DURATION)).thenCompose(
                     res -> {
                         
                     }

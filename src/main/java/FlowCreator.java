@@ -10,7 +10,10 @@ public class FlowCreator {
     public FlowCreator() {};
     public Flow<HttpRequest, HttpResponse, NotUsed> createFlow(ActorMaterializer materializer, ActorRef cache) {
         return Flow.of(HttpRequest.class).map(
+          req -> {
                 
+              return null;
+          }
         );
         return null;
     };

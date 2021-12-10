@@ -1,11 +1,12 @@
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 
+import java.nio.charset.MalformedInputException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ActorCache extends AbstractActor {
-    private Map<String, Long> store = new HashMap<>();
+    private final Map<String, Long> store = new HashMap<>();
     @Override
     public Receive createReceive() {
         return receiveBuilder().match(
@@ -14,6 +15,9 @@ public class ActorCache extends AbstractActor {
                         store.getOrDefault(message.getUrl(), (long) -1),
                         ActorRef.noSender()
                 )
-        ).match()
+        ).match(
+                MessageCache.class,
+                messageCache -> store.put(messageCache.getUrl(), messageCache.getTime())
+        ).build();
     }
 }

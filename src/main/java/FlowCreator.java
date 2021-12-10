@@ -40,7 +40,7 @@ public class FlowCreator {
         ).mapAsync(NUMBER, req -> {
             Patterns.ask(
                     cache,
-                    new Message(req.first()) {
+                    new Message(req.getKey()) {
 
                     }
             )

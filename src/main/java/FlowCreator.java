@@ -61,7 +61,7 @@ public class FlowCreator {
                                 asyncHttpClient().prepareGet(url).execute();
                                 return CompletableFuture.completedFuture((int)(System.currentTimeMillis() - initTime));
                             });
-                            return Source.single(req).via(flow).toMat(Sink.fold())
+                            return Source.from(Collections.singletonList(req)).via(flow).toMat(Sink.fold())
                         }
                     }
             ) {

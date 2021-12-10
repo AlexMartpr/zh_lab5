@@ -2,7 +2,7 @@ public class MessageCache {
     private final String url;
     private final long time;
 
-    public MessageCache(String url, long time) {
+    public MessageCache(String url, Long time) {
         this.url = url;
         this.time = time;
     }

@@ -57,7 +57,7 @@ public class FlowCreator {
                 Patterns.ask(cache, new Message(req.first()), Duration.ofSeconds(DURATION)).thenCompose(
                         res -> {
                             if ((int) res >= 0) {
-                                return CompletableFuture.completedFuture(new Pair<>(req.first(), res));
+                                return CompletableFuture.completedFuture(new Pair<>(req.first(), (int)res));
                             } else {
 
                                 Sink<Pair<String, Integer>, CompletionStage<Long>> sink = Flow.<Pair<String, Integer>>create()
@@ -77,7 +77,7 @@ public class FlowCreator {
                             }
                         }
                 )).map(resultPair -> {
-                    cache.tell(new MessageCache(resultPair.first(), resultPair.second()), ActorRef.noSender());
+                    cache.tell(new MessageCache(resultPair.first(), (Long) resultPair.second()), ActorRef.noSender());
                     return HttpResponse.create().withEntity(resultPair.first() + " " + resultPair.second());
                 }
         );

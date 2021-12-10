@@ -47,7 +47,11 @@ public class FlowCreator {
                         if ((int)res >= 0) {
                             return CompletableFuture.completedFuture(new Pair<>(req.first(), (int)res));
                         } else {
-
+                            Flow<Pair<String, Integer>, Integer, NotUsed> flow = Flow.<Pair<String, Integer>>create().mapConcat(
+                                    pair -> {
+                                        
+                                    }
+                            )
                         }
                     }
             ) {

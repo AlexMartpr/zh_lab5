@@ -21,8 +21,6 @@ import org.asynchttpclient.Dsl;
 import org.asynchttpclient.Request;
 import org.asynchttpclient.Response;
 
-import static org.asynchttpclient.Dsl.asyncHttpClient;
-
 public class FlowCreator {
     private static final String URL = "testUrl";
     private static final String COUNT = "count";
@@ -31,35 +29,35 @@ public class FlowCreator {
 
     public FlowCreator() {}
 
-    public static Flow<HttpRequest, HttpResponse, NotUsed> createFlow(ActorMaterializer materializer, ActorRef cache) throws Exception {
+    public static Flow<HttpRequest, HttpResponse, NotUsed> createFlow(ActorMaterializer materializer, ActorRef cache) throws ParseArgException {
         return Flow.of(HttpRequest.class).map(
                 req -> {
                     Query query = req.getUri().query();
                     String url;
+
                     if (query.get(URL).isPresent()) {
                         url = query.get(URL).get();
                     } else {
-                        throw new Exception("No URL parameter");
+                        throw new ParseArgException("No URL parameter");
                     }
                     int count;
-                    try {
-                        if (query.get(COUNT).isPresent()) {
+                    if (query.get(COUNT).isPresent()) {
+                        try {
                             count = Integer.parseInt(query.get(COUNT).get());
                             return new Pair<>(url, count);
-                        } else {
-                            throw new Exception("No count parameter");
+                        } catch (NumberFormatException e) {
+                            throw new ParseArgException("Can not parse value of count");
                         }
-                    } catch (NumberFormatException e) {
-                        throw new Exception("Can not parse value of count");
+                    } else {
+                        throw new ParseArgException("No count parameter");
                     }
                 }
         ).mapAsync(NUMBER, req ->
                 Patterns.ask(cache, new Message(req.first()), Duration.ofSeconds(DURATION)).thenCompose(
                         res -> {
-                            if ((int) res >= 0) {
-                                return CompletableFuture.completedFuture(new Pair<>(req.first(), (int)res));
+                            if ((long) res >= 0) {
+                                return CompletableFuture.completedFuture(new Pair<>(req.first(), (long)res));
                             } else {
-                                Sink<Integer, CompletionStage<Long>> sincFold = Sink.fold(0L, (Function2<Long, Integer, Long>) Long::sum);
                                 Sink<Pair<String, Integer>, CompletionStage<Long>> sink = Flow.<Pair<String, Integer>>create()
                                         .mapConcat(pair ->
                                                 new ArrayList<>(Collections.nCopies(pair.second(), pair.first())))
@@ -68,7 +66,7 @@ public class FlowCreator {
                                             Request request = Dsl.get(url).build();
                                             CompletableFuture<Response> resp = Dsl.asyncHttpClient().executeRequest(request).toCompletableFuture();
                                             return resp.thenCompose(response -> CompletableFuture.completedFuture((int) (System.currentTimeMillis() - initTime)));
-                                        }).toMat(sincFold, Keep.right());
+                                        }).toMat(Sink.fold(0L, (Function2<Long, Integer, Long>) Long::sum), Keep.right());
                                 return Source.from(Collections.singletonList(req))
                                         .toMat(sink, Keep.right())
                                         .run(materializer)
@@ -77,8 +75,8 @@ public class FlowCreator {
                             }
                         }
                 )).map(resultPair -> {
-                    cache.tell(new MessageCache(resultPair.first(), (Long) resultPair.second()), ActorRef.noSender());
-                    return HttpResponse.create().withEntity(resultPair.first() + " " + ((Long) resultPair.second()).toString());
+                    cache.tell(new MessageCache(resultPair.first(), resultPair.second()), ActorRef.noSender());
+                    return HttpResponse.create().withEntity(resultPair.first() + "\n avg time:  " + resultPair.second().toString() + "\n");
                 }
         );
     }

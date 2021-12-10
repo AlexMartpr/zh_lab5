@@ -10,6 +10,7 @@ import akka.http.javadsl.model.HttpResponse;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 
+import java.io.IOException;
 import java.util.concurrent.CompletionStage;
 
 public class ActorApp {
@@ -34,8 +35,7 @@ public class ActorApp {
             ).thenAccept(
                     unbound -> system.terminate()
             );
-        } catch (Exception e) {
-            //e.printStackTrace();
+        } catch (ParseArgException | IOException e) {
             System.out.println(e.getMessage());
             System.exit(-1);
         }

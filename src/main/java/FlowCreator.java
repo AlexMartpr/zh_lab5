@@ -49,7 +49,11 @@ public class FlowCreator {
         ).mapAsync(NUMBER, req -> {
             Patterns.ask(cache, new Message(req.first()), Duration.ofSeconds(DURATION)).thenCompose(
                     res -> {
-                        
+                        if ((int)res>=0) {
+                            return CompletableFuture.completedFuture(new Pair<>(req.first(), res));
+                        } else {
+                            
+                        }
                     }
             ) {
 

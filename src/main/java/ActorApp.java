@@ -10,7 +10,7 @@ import akka.stream.javadsl.Flow;
 
 public class ActorApp {
     private static final String HOST = "localhost";
-    private static final int PORT = 
+    private static final int PORT = 8080;
 
     public static void main(String[] args) {
         System.out.println("start!");

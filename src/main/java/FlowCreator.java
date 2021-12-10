@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 import akka.japi.Pair;
+import akka.stream.javadsl.Sink;
+import akka.stream.javadsl.Source;
 
 import static org.asynchttpclient.Dsl.asyncHttpClient;
 
@@ -57,8 +59,9 @@ public class FlowCreator {
                             ).mapAsync(req.second(), url -> {
                                 long initTime = System.currentTimeMillis();
                                 asyncHttpClient().prepareGet(url).execute();
-                                return CompletableFuture.completedFuture(System.currentTimeMillis() - initTime);
+                                return CompletableFuture.completedFuture((int)(System.currentTimeMillis() - initTime));
                             });
+                            return Source.single(req).via(flow).toMat(Sink.fold())
                         }
                     }
             ) {

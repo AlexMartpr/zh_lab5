@@ -7,6 +7,8 @@ import akka.pattern.Patterns;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 import akka.japi.Pair;
@@ -48,10 +50,12 @@ public class FlowCreator {
                             return CompletableFuture.completedFuture(new Pair<>(req.first(), (int)res));
                         } else {
                             Flow<Pair<String, Integer>, Integer, NotUsed> flow = Flow.<Pair<String, Integer>>create().mapConcat(
-                                    pair -> {
-                                        
-                                    }
-                            )
+                                    pair -> (
+                                        new ArrayList<>(Collections.nCopies(pair.second(), pair.first()))
+                                    )
+                            ).mapAsync(req.second(), url -> {
+                                long initTime = 
+                            })
                         }
                     }
             ) {

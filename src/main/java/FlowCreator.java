@@ -56,8 +56,9 @@ public class FlowCreator {
                                     )
                             ).mapAsync(req.second(), url -> {
                                 long initTime = System.currentTimeMillis();
-                                asyncHttpClient().
-                            })
+                                asyncHttpClient().prepareGet(url).execute();
+                                return CompletableFuture.completedFuture(System.currentTimeMillis() - initTime);
+                            });
                         }
                     }
             ) {

@@ -77,7 +77,7 @@ public class FlowCreator {
                             }
                         }
                 )).map(resultPair -> {
-                    cache.tell(new MessageCache(resultPair.first(), (long) resultPair.second()), ActorRef.noSender());
+                    cache.tell(new MessageCache(resultPair.first(), resultPair.second()), ActorRef.noSender());
                     return HttpResponse.create().withEntity(resultPair.first() + " " + resultPair.second());
                 }
         );
